@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Page</title>
+    <style>
+        *{
+            margin: 0px;
+            padding: 0px;
+        }
+        body{
+            text-align: center;
+            padding-top: 50px;
+            background-color: rgb(81, 81, 81);
+        }
+        #redtext{
+            color: red;
+        }
+        form{
+            width: 400px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 20px;
+            box-shadow: rgb(71, 232, 227) 0px 2px 8px 0px;
+            margin-top: 20px;
+        }
+        form *{
+            font-size: 15px;
+            padding: 5px 10px;
+            border-color: teal;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome to <span id="redtext">Masaiverse</span> ! <br> Register here !</h1>
+    <form action="">
+        <input id="name" type="text" required placeholder="Enter your Name">
+        <input id="age" type="number" required placeholder="Enter your Age">
+        <input id="place" type="text" required placeholder="Enter Place">
+        <select name="batch" id="batch" required>
+            <option value="" hidden>Batch</option>
+            <option value="WEB-13">WEB-13</option>
+            <option value="WEB-14">WEB-14</option>
+            <option value="WEB-15">WEB-15</option>
+        </select>
+        <select name="profession" id="profession" required>
+            <option value="" hidden>Profession</option>
+            <option value="FSD">Full Stack Dev.</option>
+            <option value="Frontend">Frontend Developer</option>
+            <option value="Backend">Backend Developer</option>
+            <option value="Student">Student</option>
+        </select>
+        <input type="submit" value="Register">
+    </form>
+</body>
+</html>
+<script>
+    const URL = "https://mockservermasaiverse.onrender.com";
+
+    let form = document.querySelector("form");
+    form.addEventListener("submit", (e)=>{
+        e.preventDefault();
+        let obj = {
+            name: form.name.value,
+            age: form.age.value,
+            place: form.place.value,
+            batch_name: form.batch.value,
+            profession: form.profession.value
+        };
+
+        fetch(`${URL}/users`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(obj)
+        })
+         .then((res)=>{
+            return res.json();
+         })
+         .then((data)=>{
+            alert("successfully registered")    
+         })
+         .catch((err)=>{
+            alert("Some error occurred"+err.message);
+         })
+    })
+</script>

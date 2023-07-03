@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report</title>
+    <style>
+                 *{
+            margin: 0px;
+            padding: 0px;
+        }
+        nav{
+            width: 100%;
+            height: 50px;
+            background-color: teal;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        nav *{
+            height: 100%;
+            color: white;
+        }
+        nav button{
+            width: 100px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            background-color: teal;
+        }
+        nav button:hover{
+            background-color: white;
+            color: teal;
+        }
+        #selected{
+            background-color: white;
+            color: teal;
+        }
+        body{
+            text-align: center;
+        }
+        #container{
+            width: 80%;
+            margin: auto;
+            margin-top: 30px;
+        }
+        table th{
+            width: 400px;
+            padding: 10px 0px;
+            border-left: 1px solid red;
+            border-right: 1px solid red;
+            background-color: rgb(214, 214, 214);
+        }
+        table td{
+            border: 1px solid teal;
+            height: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <a href="./login.html"><button >Login</button></a>
+        <a href="./data.html"><button >Data</button></a>
+        <a href="./report.html"><button id="selected">Report</button></a>
+    </nav>
+    <h1>Report Page</h1>
+    <div id="container"></div>
+</body>
+</html>
+
+<script>
+    const URL = "https://mockservermasaiverse.onrender.com";
+
+    let token = localStorage.getItem("token") || null;
+    if(!token || token[0]!== "Q"){
+        alert("Login first!");
+        window.location.href = "./login.html";
+    }
+    else{
+        fetchUsers();
+    }
+
+    let container = document.querySelector("#container");
+
+    async function fetchUsers(){
+        await fetch(`${URL}/users`)
+            .then((res)=>res.json())
+            .then((data)=>{
+                // console.log(data);
+                displayTable(data);
+            })
+            .catch((err)=>alert("Some error occured : "+err.message));
+    }
+
+    function displayTable(data){
+        let totalGuest = data.length;
+        let totalStudents = 0;
+        let totalPro = 0;
+        let avgAge = 0;
+        data.forEach((ele)=>{
+            if(ele.profession === "Student"){
+                totalStudents++;
+            }
+            else if(ele.profession !== "Student"){
+                totalPro++;
+            }
+
+            avgAge += +ele.age;
+        })
+
+        avgAge = avgAge/totalGuest;
+        
+        let table = document.createElement("table");
+
+            let thead = document.createElement("thead");
+                let th1 = document.createElement("th");
+                th1.textContent = "Number of Guests";
+                let th2 = document.createElement("th");
+                th2.textContent = "Number of Students";
+                let th3 = document.createElement("th");
+                th3.textContent = "Number of Working Professionals";
+                let th4 = document.createElement("th");
+                th4.textContent = "Average Age of Guests";
+            thead.append(th1,th2,th3,th4);
+
+            let tbody = document.createElement("tbody");
+            let tr = document.createElement("tr");
+                let td1 = document.createElement("td");
+                td1.textContent = totalGuest;
+                let td2 = document.createElement("td");
+                td2.textContent = totalStudents;
+                let td3 = document.createElement("td");
+                td3.textContent = totalPro;
+                let td4 = document.createElement("td");
+                td4.textContent = avgAge;
+            tr.append(td1,td2,td3,td4);
+            tbody.append(tr);
+        table.append(thead,tbody);
+
+        container.append(table);
+    }
+
+</script>
+<!-- 
+- Total number of guests attending.
+- Number of students attending.
+- Number of working professional attending.
+- Average age of people attending the event (using guests count). -->

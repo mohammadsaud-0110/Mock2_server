@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data</title>
+    <style>
+         *{
+            margin: 0px;
+            padding: 0px;
+        }
+        nav{
+            width: 100%;
+            height: 50px;
+            background-color: teal;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        nav *{
+            height: 100%;
+            color: white;
+        }
+        nav button{
+            width: 100px;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            background-color: teal;
+        }
+        nav button:hover{
+            background-color: white;
+            color: teal;
+        }
+        #selected{
+            background-color: white;
+            color: teal;
+        }
+        body{
+            text-align: center;
+        }
+        #container{
+            width: 80%;
+            margin: auto;
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            grid-template-rows: auto;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        #container>div{
+            box-shadow: rgb(44, 126, 202) 0px 4px 12px;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        #container>div>img{
+            width: 100px;
+            border-radius: 20px;
+            
+        }
+        #container>div>input{
+            border: none;
+            color: rgb(51, 51, 51);
+            /* pointer-events: none; */
+        }
+        #container>div>button{
+            width: 100%;
+        }
+    </style>
+</head>
+
+
+<body>
+    <nav>
+        <a href="./login.html"><button >Login</button></a>
+        <a href="./data.html"><button id="selected">Data</button></a>
+        <a href="./report.html"><button>Report</button></a>
+    </nav>
+    <h1>Data Page</h1>
+    <div id="container"></div>
+</body>
+</html>
+<script>
+    const URL = "https://mockservermasaiverse.onrender.com";
+
+    let token = localStorage.getItem("token") || null;
+    if(!token || token[0]!== "Q"){
+        alert("Login first!");
+        window.location.href = "./login.html";
+    }
+    else{
+        fetchUsers();
+    }
+
+    async function fetchUsers(){
+        await fetch(`${URL}/users`)
+            .then((res)=>res.json())
+            .then((data)=>{
+                // console.log(data);
+                displayCard(data);
+            })
+            .catch((err)=>alert("Some error occured"+err.message));
+    }
+
+    let container = document.querySelector("#container");
+
+    function displayCard(data){
+        container.innerHTML = null;
+
+        data.forEach((ele)=>{
+            let card = document.createElement("div");
+
+            let img = document.createElement("img");
+            img.setAttribute("src", "https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse4.mm.bing.net%2Fth%3Fid%3DOIP.bfDNFzH1NVQ5GEVc-CSsmwHaLH%26pid%3DApi&f=1&ipt=9c5f837a97363e080e10ab348dc1e737806a843e69c7608754e769bd49b4053f&ipo=images")
+
+            let name = document.createElement("input");
+            name.value = ele.name;
+
+            let age = document.createElement("input");
+            age.value = ele.age;
+
+            let place = document.createElement("input");
+            place.value = ele.place;
+
+            let batch_name = document.createElement("input");
+            batch_name.value = ele.batch_name;
+
+            let profession = document.createElement("input");
+            profession.value = ele.profession;
+
+            let editbtn = document.createElement("button");
+            editbtn.textContent = "Edit";
+            editbtn.addEventListener("click", (e)=>{
+                e.preventDefault();
+
+                fetch(`${URL}/users/${ele.id}`, {
+                    method: "PATCH",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        name: name.value,
+                        age: age.value,
+                        place: place.value,
+                        batch_name: batch_name.value,
+                        profession: profession.value
+                    })
+                })
+                .then((res)=>{
+                    return res.json();
+                })
+                .then((data)=>{
+                    alert("User Detail Updated");
+                    fetchUsers();
+                })
+                .catch((err)=>{
+                    alert("Some error occurred"+err.message);
+                })
+            })
+
+            let deletebtn = document.createElement("button");
+            deletebtn.textContent = "Delete";
+            deletebtn.addEventListener("click", (e)=>{
+                e.preventDefault();
+                deleteUser(ele);
+            })
+
+            card.append(img,name,age,place,batch_name,profession,editbtn,deletebtn);
+            
+            container.append(card);
+        });
+    }
+
+    async function deleteUser(user){
+        console.log(user);
+        await fetch(`${URL}/users/${user.id}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+         .then((res)=>res.json())
+         .then((data)=>{
+            alert("User Deleted");
+            fetchUsers();
+        })
+         .catch((err)=>alert("Some error occurred while deleting: "+err.message));
+    }
+</script>
